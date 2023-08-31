@@ -1,0 +1,44 @@
+body {
+    background-image: -webkit-linear-gradient(top left, yellow 0%, blue 100%);
+}
+
+header, #Titles {
+    background-image: url("cloudy_sun.png");
+    text-align: center;
+}
+
+h1 {
+    text-decoration: underline;
+}
+
+#Titles {
+    text-align: center;
+}
+#login_register_field_top_right {
+    background-color: orange;
+    text-align: right;
+    padding-right: 1px;
+}
+
+form {
+    text-align: center;
+}
+
+#search_and_filters {
+    text-align: center;
+    border: red solid;
+    padding-bottom: 5px;
+}
+
+#results {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-content: center;
+    /*border: red 5px solid;*/
+}
+
+footer {
+    background-color: orange;
+    text-align: center;
+}

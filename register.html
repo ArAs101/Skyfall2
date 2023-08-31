@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | Skyfall</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<header>
+    <div id="login_register_field_top_right">
+        <span>Want to log in instead? <button
+                onclick="window.location.href = 'login.html'">Login</button></span>
+    </div>
+</header>
+<main>
+    <div id="Titles">
+        <h1>Skyfall</h1>
+        <h2>Tomorrow's weather website</h2>
+    </div>
+
+    <br>
+    <div class="gui" style="text-align: center">
+    <span>Please enter your credentials in order to register.</span>
+
+    <form id="register_form" action="/register" method="post">
+        <p>
+            Username: <input id="register_username_input" placeholder="Username" type="text" required>
+        </p>
+
+        <p>
+            Password: <input id="register_password_input" placeholder="Password" type="password" required>
+        </p>
+
+        <button type="submit" id="register_button">Register</button>
+    </form>
+    </div>
+</main>
+<br>
+<br>
+<br>
+
+<footer>&copy; 2023 <a href="index.html">Skyfall.</a></footer>
+</body>
+</html>
