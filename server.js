@@ -176,19 +176,33 @@ app.get('/protected', validateCookie, (req, res) => {
 app.post('/login', (req, res) => {
     console.log(req.sessionID)
     const {username, password} = req.body
+    console.log(req.body, "Login body")
     if (username && password) {
+        console.log("Username & Password exist!")
         if (req.session.authenticated) {
             res.json(req.session)
+            console.log("Test")
         } else {
-            if (password === '123') {
-                req.session.authenticated = true
-                req.session.user = {
-                    username, password
+            console.log("Not authenticated yet!")
+            fs.readFile("usersList.json", (err, data) => {
+                data = JSON.parse(data)
+                console.log(data)
+                if (data[username] !== undefined) {
+                    console.log("Username not undefined!")
+                    if (data[username] === password) {
+                        req.session.authenticated = true
+                        req.session.user = {
+                            username, password
+                        }
+                        //res.cookie('isLoggedIn', true)
+                        console.log("Sucessful read!")
+
+                        res.json(req.session)
+                    } else {
+                        res.status(403).json({msg: 'Bad Credentials!'})
+                    }
                 }
-                res.json(req.session)
-                } else {
-                res.status(403).json({msg: 'Bad Credentials!'})
-            }
+            })
         }
     } else {
         res.status(403).json({msg: 'Bad Credentials!'})
@@ -197,33 +211,40 @@ app.post('/login', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const user = req.body
-    console.log(req.body)
+    console.log(req.body, "BODY")
     //console.log(user.password)
     const hashedPassword = await bcrypt.hashSync(user.password.toString(), 10).toString();
-    const newUser = {name: user.username, password: hashedPassword}
     //const var = {key: value, key:value}
-    console.log(newUser)
     const filePath = 'usersList.json';
 
-    fs.appendFile(filePath, JSON.stringify(newUser), (err) => {
+    fs.readFile(filePath, "utf8", (err, data) => {
         if (err) {
-            console.log('Error writing to file!')
+            console.error("Error reading file")
+            return;
         }
+        const jsonData = JSON.parse(data);
+        jsonData[user.username] = user.password
+
+        fs.writeFile(filePath, JSON.stringify(jsonData), (err) => {
+            if (err) {
+                console.log('Error writing to file!')
+            }
+        })
     })
     // Specify the file path const filePath = 'example.txt';  // Use the fs.writeFile method to write to the file fs.writeFile(filePath, data, (err) => {   if (err) {     console.error('Error writing to file:', err);   } else {     console.log('File has been written successfully.');   } });
     res.status(200)
-
 })
 
 
-/*PUT
+//PUT
 app.put("/username", (req, res) => {
+let username = req.username
+    
+})
 
-})*/
 
-
-/*DELETE
-app.delete("/userdelete", (req, res) => {
+//DELETE
+/*app.delete("/userdelete", (req, res) => {
 
 })*/
 

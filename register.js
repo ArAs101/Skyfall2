@@ -15,12 +15,15 @@ window.onload = function () {
             headers:{"Content-Type":"application/json"},
             body: JSON.stringify(formData)
         }).then(response => {
+            console.log(response.ok)
             if (!response.ok) {
+                console.log("Response: ", response)
                 throw new Error('Network response was not ok!')
             }
-            window.location.href = '/'
+
         }).then(data => {
             console.log('Server response: ', data)
+            window.location.href = '/login'
         }).catch(error => {
             console.error('Problem with fetch operation: ', error)
         })

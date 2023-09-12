@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Login | Skyfall</title>
     <link rel="stylesheet" href="index.css">
+    <script src="login.js"></script>
 </head>
 <body>
 
@@ -26,17 +27,19 @@
 
     <form id="login_form">
         <p>
-            Username: <input id="login_username_input" placeholder="Username" type="text" required>
+            <label for="login_username_input">Username: </label>
+            <input id="login_username_input" placeholder="Username" type="text" required>
         </p>
 
         <p>
-            Password: <input id="login_password_input" placeholder="Password" type="password" required>
+            <label for="login_password_input">Password: </label>
+            <input id="login_password_input" placeholder="Password" type="password" required>
         </p>
 
         <p>
             <a href="reset_password.html">Forgot your Password?</a>
         </p>
-        <button type="button" id="login_button">Log in</button>
+        <button type="submit" id="login_button">Log in</button>
     </form>
     </div>
 </main>
