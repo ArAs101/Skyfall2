@@ -3,7 +3,10 @@ const path = require("path");
 const app = express()
 const axios = require('axios')
 const cookieParser = require("cookie-parser");
-const sessions = require('express-session');
+const session = require('express-session');
+const store = new session.MemoryStore()
+const bcrypt = require('bcrypt')
+const fs = require('fs');
 const API_KEY = 'c3f5d777155024ea1c2c209f90f0f34e';
 
 
@@ -12,31 +15,91 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
-//username and password
+
+app.use((req, res, next) => {
+    console.log(store)
+    console.log(`${req.method}, ${req.url}`)
+    next()
+})
+
+/*//username and password
 const myusername = 'user1'
-const mypassword = 'mypassword'
+const mypassword = 'mypassword'*/
 
 // a variable to save a session
-var session;
+//var session;
 
 
 const oneDay = 1000 * 60 * 60 * 24;
-app.use(sessions({
+app.use(session({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
+    saveUninitialized: false,
     cookie: { maxAge: oneDay },
-    resave: false
+    resave: false,
+    store
 }));
 
-app.get('/',(req,res) => {
+const users = [
+    {name: 'Armin', age: 21},
+    {name: 'Patrick', age: 21},
+    {name: 'Lukas', age: 27},
+    {name: 'Simon', age: 25},
+    {name: 'Tristan', age: 21},
+    {name: 'Michi', age: 19}
+]
+
+const posts = [
+    {title: 'My favorite foods'},
+    {title: 'My favorite games'}
+]
+app.get('/', (req, res) => {
+    res.send({
+        msg: 'Hello!',
+        user: {}
+    })
+})
+
+app.get('/users', (req, res) => {
+    res.status(200).send(users)
+})
+
+app.post('/users', (req, res) => {
+    const user = req.body
+    users.push(user)
+    res.status(201).send('Created User!')
+})
+
+app.get('/users/:name', (req, res) => {
+    const {name} = req.params
+    const user = users.find((user) => user.name === name)
+    if (user) {
+        res.status(200).send(user)
+    } else {
+        res.status(404).send('User Not Found!')
+    }
+})
+
+app.get('/posts', (req, res) => {
+    console.log(req.query)
+    const {title} = req.query
+    if (title) {
+        const post = posts.find((post) => post.title === title)
+        if (post) res.status(200).send(post)
+    } else {
+        res.status(404).send('Post Not Found!')
+    }
+    res.status(200).send(posts)
+})
+
+/*app.get('/',(req,res) => {
     session=req.session;
     if(session.userid){
         res.send("Welcome User <a href=\'/logout'>click to logout</a>");
     }else
         res.sendFile('views/index.html',{root:__dirname})
-});
+});*/
 
-app.post('/user',(req,res) => {
+/*app.post('/user',(req,res) => {
     if(req.body.username == myusername && req.body.password == mypassword) {
         session = req.session;
         session.userid = req.body.username;
@@ -46,7 +109,7 @@ app.post('/user',(req,res) => {
     else{
         res.send('Invalid username or password');
     }
-})
+})*/
 
 app.get("/getweather", async function (req, res) {
     // Access the city ID from the request query parameters
@@ -72,6 +135,86 @@ app.get("/getweather", async function (req, res) {
         res.status(404).send('City not found');
     }
 })
+
+function validateAuthToken (req, res, next) {
+    console.log('Inside Validate Auth Token function')
+    const {authorization} = req.headers
+    if (authorization && authorization === '123') {
+        next()
+    } else {
+        res.status(403).send({msg: 'Forbidden, Incorrect Credentials!'})
+    }
+}
+
+app.post('/posts', validateAuthToken, (req, res) => {
+    const post = req.body
+    posts.push(post)
+    res.status(201).send(post)
+})
+
+function validateCookie (req, res, next) {
+    const {cookies} = req
+    if ('session_Id' in cookies) {
+        console.log('Session ID exists!')
+        if (cookies.session_Id === '1234567') {
+            next()
+        } else {
+            res.status(403).send({msg: 'Not Authenticated!'})
+        }
+    }
+}
+
+app.get('/signin', (req, res) => {
+    res.cookie('session_Id', '123456')
+    res.status(200).json({msg: 'Logged in.'})
+})
+
+app.get('/protected', validateCookie, (req, res) => {
+    res.status(200).json({msg: 'You are authorized!'})
+})
+
+app.post('/login', (req, res) => {
+    console.log(req.sessionID)
+    const {username, password} = req.body
+    if (username && password) {
+        if (req.session.authenticated) {
+            res.json(req.session)
+        } else {
+            if (password === '123') {
+                req.session.authenticated = true
+                req.session.user = {
+                    username, password
+                }
+                res.json(req.session)
+                } else {
+                res.status(403).json({msg: 'Bad Credentials!'})
+            }
+        }
+    } else {
+        res.status(403).json({msg: 'Bad Credentials!'})
+    }
+})
+
+app.post('/register', async (req, res) => {
+    const user = req.body
+    console.log(req.body)
+    //console.log(user.password)
+    const hashedPassword = await bcrypt.hashSync(user.password.toString(), 10).toString();
+    const newUser = {name: user.username, password: hashedPassword}
+    //const var = {key: value, key:value}
+    console.log(newUser)
+    const filePath = 'usersList.json';
+
+    fs.appendFile(filePath, JSON.stringify(newUser), (err) => {
+        if (err) {
+            console.log('Error writing to file!')
+        }
+    })
+    // Specify the file path const filePath = 'example.txt';  // Use the fs.writeFile method to write to the file fs.writeFile(filePath, data, (err) => {   if (err) {     console.error('Error writing to file:', err);   } else {     console.log('File has been written successfully.');   } });
+    res.status(200)
+
+})
+
 
 /*PUT
 app.put("/username", (req, res) => {

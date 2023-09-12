@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Register | Skyfall</title>
     <link rel="stylesheet" href="index.css">
+    <script src="register.js"></script>
 </head>
 <body>
 
@@ -23,13 +24,15 @@
     <div class="gui" style="text-align: center">
     <span>Please enter your credentials in order to register.</span>
 
-    <form id="register_form" action="/register" method="post">
+    <form id="register_form">
         <p>
-            Username: <input id="register_username_input" placeholder="Username" type="text" required>
+            <label for="register_username_input">Username: </label>
+            <input id="register_username_input" placeholder="Username" type="text" required>
         </p>
 
         <p>
-            Password: <input id="register_password_input" placeholder="Password" type="password" required>
+            <label for="register_password_input">Password: </label>
+            <input id="register_password_input" placeholder="Password" type="password" required>
         </p>
 
         <button type="submit" id="register_button">Register</button>
