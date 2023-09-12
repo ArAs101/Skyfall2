@@ -1,21 +1,25 @@
 window.onload = function () {
-    const cookies = document.cookie
+    const cookies = document.cookie.split('; ')
+
+    const data = {
+
+    }
     let textField = document.getElementById('Username')
-    for (let cookie in cookies) {
-        const [name, value] = cookies.split(',');
-        if (name === 'Username') {
-            textField.textContent = value
+    for (let index in cookies) {
+        if (cookies[index].trim().startsWith('myUsername')) {
+            let returnCookie = cookies[index].trim().split("=")
+            textField.value = returnCookie[1]
+            data[oldUsername] = returnCookie[1]
+            break
         }
     }
-
-    const newText = textField;
-    // Make an HTTP request to the server to update the data
+// Make an HTTP request to the server to update the data
     fetch('/username', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ newText }),
+        body: JSON.stringify({oldUsername, textField.value})
     })
         .then(response => {
             if (response.ok) {

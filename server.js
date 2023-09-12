@@ -130,6 +130,7 @@ app.get("/getweather", async function (req, res) {
             "temperature": temperature,
             "weatherState": state
         }
+        console.log(infoTobeSentback)
         res.json(infoTobeSentback)
     } else {
         res.status(404).send('City not found');
@@ -238,8 +239,28 @@ app.post('/register', async (req, res) => {
 
 //PUT
 app.put("/username", (req, res) => {
-let username = req.username
-    
+    let username = req.username
+    console.log(username)
+
+    fs.readFile(filePath, "utf8", (err, data) => {
+        if (err) {
+            console.error("Error reading file")
+            return;
+        }
+        const jsonData = JSON.parse(data);
+        jsonData[user.username] = user.password
+        const pw = jsonData[user.OldUsername]
+        delete jsonData[user.OldUsername];
+        jsonData[user.username] = pw
+
+        fs.writeFile(filePath, JSON.stringify(jsonData), (err) => {
+            if (err) {
+                console.log('Error writing to file!')
+            }
+        })
+    })
+
+
 })
 
 

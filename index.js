@@ -3,9 +3,8 @@ window.onload = function () {
     const cookies = document.cookie.split('; ')
     let isLoggedIn = false;
 
-    for (const cookie of cookies) {
-        const [name, value] = cookie.split('; ');
-        if (name === 'isLoggedIn') {
+    for (let index in cookies) {
+        if (cookies[index].trim().startsWith('isLoggedIn')) {
             isLoggedIn = true;
             break
         }
@@ -75,12 +74,9 @@ function loadData(data) {
     if (isLoggedIn) {
         myLabel = document.createElement("h4").textContent = data.weatherState[0].description
         myResults.append(myLabel)
-    }
-    /*if (true) {
-        myLabel = document.createElement("h4").textContent = data.weatherState[0].description
+        myLabel = document.createElement("h3").textContent = "Please consider logging in or registering for more information..."
         myResults.append(myLabel)
-    }*/
-
+    }
 }
     /*
 

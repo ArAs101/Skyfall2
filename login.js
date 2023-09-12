@@ -1,16 +1,5 @@
-function addCookie(name, value, expireationDate) {
-    let cookie = `${name}=${value}; `;
-
-    /*if (daysToExpire) {
-        const expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + daysToExpire);
-        cookie += `expires=${expirationDate.toUTCString()};`;
-    }*/
-
-    let expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + (60 * 1000))
-
-    document.cookie += cookie + "path=/;expires="+expirationDate.toUTCString()
+function addCookie(name, value) {
+    document.cookie = `${name}=${value}; `
 }
 
 window.onload = function () {
