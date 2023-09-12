@@ -239,35 +239,33 @@ app.post('/register', async (req, res) => {
 
 //PUT
 app.put("/username", (req, res) => {
-    let username = req.username
-    console.log(username)
-
+    const user = req.body
+    console.log(user)
+    const filePath = 'usersList.json';
     fs.readFile(filePath, "utf8", (err, data) => {
         if (err) {
             console.error("Error reading file")
             return;
         }
         const jsonData = JSON.parse(data);
-        jsonData[user.username] = user.password
-        const pw = jsonData[user.OldUsername]
-        delete jsonData[user.OldUsername];
+        const pw = jsonData[user.oldUsername]
+        delete jsonData[user.oldUsername];
         jsonData[user.username] = pw
-
+        console.log(jsonData)
         fs.writeFile(filePath, JSON.stringify(jsonData), (err) => {
             if (err) {
                 console.log('Error writing to file!')
             }
+            res.sendStatus(200)
         })
     })
-
-
 })
 
 
 //DELETE
-/*app.delete("/userdelete", (req, res) => {
-
-})*/
+app.delete("/userdelete", (req, res) => {
+res.sendStatus(200)
+})
 
 app.listen("3000")
 console.log("Server listening on http://localhost:3000")

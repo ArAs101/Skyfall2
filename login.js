@@ -1,7 +1,6 @@
 function addCookie(name, value) {
     document.cookie = `${name}=${value}; `
 }
-
 window.onload = function () {
     document.getElementById('login_button').addEventListener('click', function (ev) {
         ev.preventDefault()
