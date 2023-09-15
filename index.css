@@ -2,7 +2,7 @@ body {
     background-image: -webkit-linear-gradient(top left, yellow 0%, blue 100%);
 }
 
-header, #Titles {
+#Titles {
     background-image: url("cloudy_sun.png");
     text-align: center;
 }
@@ -11,12 +11,10 @@ h1 {
     text-decoration: underline;
 }
 
-#Titles {
-    text-align: center;
-}
 #login_register_field_top_right {
     background-color: orange;
     text-align: right;
+    /*justify-content: right;*/
     padding-right: 1px;
 }
 
@@ -24,18 +22,29 @@ form {
     text-align: center;
 }
 
-#search_and_filters {
+#search {
     text-align: center;
+    align-self: center;
     border: red solid;
     padding-bottom: 5px;
 }
 
+#sidebar_and_results {
+    display: grid;
+    grid-template-areas: "a b";
+}
+
+#sidebar {
+    grid-area: a;
+    border: red solid 5px;
+    align-self: center;
+}
+
 #results {
-    display: flex;
-    flex-direction: column;
+    display: none;
+    grid-area: b;
     text-align: center;
-    align-content: center;
-    /*border: red 5px solid;*/
+    border: green solid 5px;
 }
 
 footer {

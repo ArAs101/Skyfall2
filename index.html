@@ -21,23 +21,30 @@
         <br>
         <h2>The weather website for everyone</h2>
     </div>
-
-    <div id="search_and_filters">
+    <div id="search">
         <h3>Please enter a location:</h3>
-        <form id="search" >
+        <form id="search_field" >
             <input id="myInput" type="search" placeholder="Your location here">
             <input value="Search" id="myButton" type="submit">
-
         </form>
     </div>
     <br><br>
-    <div id="results">
-
-
+    <div id="sidebar_and_results">
+        <div id="sidebar">
+            <h4>Manage your favourite cities!</h4>
+            <form>
+                <label for="city_adder"></label><input type="search" id="city_adder">
+                <input id="add_city_button" value="Add city to Favourites" type="submit">
+            </form>
+            <ul>
+            </ul>
+        </div>
+        <div id="results">
+<!--            results from search-->
+        </div>
     </div>
     <br><br>
 </main>
-
 <footer>
     <span>&copy; 2023 Skyfall.</span>
 </footer>

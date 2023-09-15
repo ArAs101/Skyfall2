@@ -7,6 +7,10 @@ const session = require('express-session');
 const store = new session.MemoryStore()
 const bcrypt = require('bcrypt')
 const fs = require('fs');
+const bodyParser = require('body-parser')
+const favouriteCities = require('./usersList.json');
+const {readUserData, writeUserData} = require('./usersList.json')
+const {users, addUser} = require("./usersList");
 const API_KEY = 'c3f5d777155024ea1c2c209f90f0f34e';
 
 
@@ -28,6 +32,22 @@ const mypassword = 'mypassword'*/
 
 // a variable to save a session
 //var session;
+app.use(bodyParser.json())
+
+/*app.use(bodyParser.json());
+app.use(express.urlencoded({extended: false}));
+app.use(express.static(__dirname));
+app.use(cookieParser());
+app.use(
+    session({
+        secret: "thisisasecretthatnooneshouldknow",
+        resave: false,
+        saveUninitialized: true,
+        cookie: {maxAge: oneDay}
+    })
+);*/
+
+
 
 
 const oneDay = 1000 * 60 * 60 * 24;
@@ -39,77 +59,62 @@ app.use(session({
     store
 }));
 
-const users = [
-    {name: 'Armin', age: 21},
-    {name: 'Patrick', age: 21},
-    {name: 'Lukas', age: 27},
-    {name: 'Simon', age: 25},
-    {name: 'Tristan', age: 21},
-    {name: 'Michi', age: 19}
-]
+app.get('/logout',(req, res) => {
+    req.session.destroy();
+    //req.clearCookie()
+    res.json('User successfully logged out!').status(200)
+    //res.redirect('test.html');
+});
 
-const posts = [
-    {title: 'My favorite foods'},
-    {title: 'My favorite games'}
-]
-app.get('/', (req, res) => {
-    res.send({
-        msg: 'Hello!',
-        user: {}
-    })
-})
 
-app.get('/users', (req, res) => {
-    res.status(200).send(users)
-})
 
-app.post('/users', (req, res) => {
-    const user = req.body
-    users.push(user)
-    res.status(201).send('Created User!')
-})
+app.post('/register', (req, res) => {
+    //console.log('Registering...')
 
-app.get('/users/:name', (req, res) => {
-    const {name} = req.params
-    const user = users.find((user) => user.name === name)
-    if (user) {
-        res.status(200).send(user)
+    const {username, password} = req.body
+    const userExists = users.some(user => user.username === username)
+    if (userExists) {
+        console.log('User already exists!')
+        res.json({success: false, message: 'This user already exists!'})
     } else {
-        res.status(404).send('User Not Found!')
+        let newUser = {username: username, password: password}
+        addUser(newUser)
+        console.log('User successfully registered!')
+        res.json({success: true, message: 'User successfully registered!'})
     }
+
+    /*const userData = readUserData()
+    // Check if the username or email is already in use
+    const isDuplicate = userData.some(user => user.username === username || user.password === password);
+
+    /!*if (isDuplicate) {
+        res.status(400).json({ message: 'Username or email is already in use' });
+    } else {*!/
+        // Add the new user to the user data
+        userData.push({ username, password });
+
+        // Write the updated user data back to the file
+        writeUserData(userData);
+
+        res.status(201).json({ message: 'User registered successfully' });*/
+    //}
+    //const newEntry = fs.readFileSync('/usersList.json', 'utf8')
+
 })
 
-app.get('/posts', (req, res) => {
-    console.log(req.query)
-    const {title} = req.query
-    if (title) {
-        const post = posts.find((post) => post.title === title)
-        if (post) res.status(200).send(post)
+
+app.post('/login', (req, res) => {
+    const {username, password} = req.body
+    const userId = users.find((user) => user.username === username)
+    if (userId && userId.password === password) {
+        req.session.user = userId
+        res.json({success: true})
     } else {
-        res.status(404).send('Post Not Found!')
+        console.log('User successfully logged in!')
+        res.json({success: false, message: 'User successfully logged in!'})
     }
-    res.status(200).send(posts)
 })
 
-/*app.get('/',(req,res) => {
-    session=req.session;
-    if(session.userid){
-        res.send("Welcome User <a href=\'/logout'>click to logout</a>");
-    }else
-        res.sendFile('views/index.html',{root:__dirname})
-});*/
-
-/*app.post('/user',(req,res) => {
-    if(req.body.username == myusername && req.body.password == mypassword) {
-        session = req.session;
-        session.userid = req.body.username;
-        console.log(req.session)
-        res.send(`Hey there, welcome <a href=\'/logout'>click to logout</a>`);
-    }
-    else{
-        res.send('Invalid username or password');
-    }
-})*/
 
 app.get("/getweather", async function (req, res) {
     // Access the city ID from the request query parameters
@@ -131,11 +136,67 @@ app.get("/getweather", async function (req, res) {
             "weatherState": state
         }
         console.log(infoTobeSentback)
+        /*if (!favouriteCities.includes(cityName, 0)) {
+            favouriteCities.push(cityName)
+            console.log(cityName + ", Favourites: " + favouriteCities.toString())
+        } else console.log("NO!")*/
         res.json(infoTobeSentback)
     } else {
         res.status(404).send('City not found');
     }
 })
+
+/*
+app.get("/getcity", async function (req, res) {
+    const city = req.query.city; // use a query parameter to get the city
+    const geo_api_response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_KEY}`);
+
+    if (geo_api_response.data[0]) {
+        const lat = geo_api_response.data[0].lat
+        const lon = geo_api_response.data[0].lon
+
+        //const owm_response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+        const cityName = geo_api_response.data[0].name
+        const infoTobeSentback = {
+            "cityName": cityName
+        }
+        console.log(infoTobeSentback)
+        //cities.push(cityName)
+        res.json(infoTobeSentback)
+    } else {
+        res.status(404).send('City not found');
+    }
+})
+*/
+
+
+
+
+
+app.post("/addcity", async function (req, res) {
+    const city = req.query.city; // use a query parameter to get the city
+    const geo_api_response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_KEY}`);
+
+    if (geo_api_response.data[0]) {
+        /*const lat = geo_api_response.data[0].lat
+        const lon = geo_api_response.data[0].lon
+
+        //const owm_response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+*/        const cityName = geo_api_response.data[0].name
+        const infoTobeSentback = {
+            "cityName": cityName
+        }
+        console.log("Backend reached; " + infoTobeSentback)
+        //pushCity(cityName)
+        //favouriteCities.(cityName)
+        //favouriteCities
+        res.status(200).json(infoTobeSentback)
+    } else {
+        res.status(404).send('City not found');
+    }
+})
+
+/*
 
 function validateAuthToken (req, res, next) {
     console.log('Inside Validate Auth Token function')
@@ -224,7 +285,7 @@ app.post('/register', async (req, res) => {
             return;
         }
         const jsonData = JSON.parse(data);
-        jsonData[user.username] = user.password
+        jsonData[user.username] = hashedPassword
 
         fs.writeFile(filePath, JSON.stringify(jsonData), (err) => {
             if (err) {
@@ -235,7 +296,6 @@ app.post('/register', async (req, res) => {
     // Specify the file path const filePath = 'example.txt';  // Use the fs.writeFile method to write to the file fs.writeFile(filePath, data, (err) => {   if (err) {     console.error('Error writing to file:', err);   } else {     console.log('File has been written successfully.');   } });
     res.status(200)
 })
-
 
 //PUT
 app.put("/username", (req, res) => {
@@ -260,12 +320,31 @@ app.put("/username", (req, res) => {
         })
     })
 })
+*/
+
+app.put('/cities', (req, res) => {
+    //let citiesList = req.body
+
+    
+})
 
 
 //DELETE
-app.delete("/userdelete", (req, res) => {
-res.sendStatus(200)
-})
+/*app.delete(`/delete/:city`, (req, res) => {
+    console.log("Backend trying to delete city")
+
+    res.status(200)
+    /!*const cityList = document.getElementById("sidebar")
+    const badCity = parseInt(req.params.id)
+    const bcIndex = citydelete.findIndex(city => city.id === cityId)
+
+    if (bcIndex === -1) {
+        res.status(404).json("Index not found!")
+    } else {
+        citydelete.splice(bcIndex, 1)
+        res.status(204).send()
+    }*!/
+})*/
 
 app.listen("3000")
 console.log("Server listening on http://localhost:3000")

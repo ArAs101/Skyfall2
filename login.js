@@ -18,14 +18,15 @@ window.onload = function () {
             headers:{"Content-Type":"application/json"},
             body: JSON.stringify(formData)
         }).then(response => {
-            console.log(response.ok)
-            if (!response.ok) {
+            if (response.ok) {
+                alert("You have been logged in!")
+            } else {
                 console.log("Response: ", response)
                 throw new Error('Network response was not ok!')
             }
 
         }).then(data => {
-            //window.location.href = '/'
+            window.location.href = '/'
             console.log('Server response: ', data)
             addCookie('isLoggedIn', true)
             console.log(formData.username)
