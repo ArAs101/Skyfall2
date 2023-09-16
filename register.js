@@ -16,9 +16,9 @@ window.onload = function () {
             if (response.ok) {
                 alert("You have been registered!")
             }
+        }).then(response => {
+            window.location.href = '/login.html'
         })
-
-
 
 /*        //Get form data
         // Send POST request to server

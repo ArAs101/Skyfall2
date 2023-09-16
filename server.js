@@ -8,7 +8,7 @@ const store = new session.MemoryStore()
 const bcrypt = require('bcrypt')
 const fs = require('fs');
 const bodyParser = require('body-parser')
-const favouriteCities = require('./usersList.json');
+//const favouriteCities = require('./usersList.json');
 const {readUserData, writeUserData} = require('./usersList.json')
 const {users, addUser} = require("./usersList");
 const API_KEY = 'c3f5d777155024ea1c2c209f90f0f34e';
@@ -48,8 +48,6 @@ app.use(
 );*/
 
 
-
-
 const oneDay = 1000 * 60 * 60 * 24;
 app.use(session({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
@@ -59,13 +57,15 @@ app.use(session({
     store
 }));
 
+
+const favouriteCities = []
+
 app.get('/logout',(req, res) => {
     req.session.destroy();
     //req.clearCookie()
     res.json('User successfully logged out!').status(200)
     //res.redirect('test.html');
 });
-
 
 
 app.post('/register', (req, res) => {
@@ -102,7 +102,6 @@ app.post('/register', (req, res) => {
 
 })
 
-
 app.post('/login', (req, res) => {
     const {username, password} = req.body
     const userId = users.find((user) => user.username === username)
@@ -114,7 +113,6 @@ app.post('/login', (req, res) => {
         res.json({success: false, message: 'User successfully logged in!'})
     }
 })
-
 
 app.get("/getweather", async function (req, res) {
     // Access the city ID from the request query parameters
@@ -135,12 +133,11 @@ app.get("/getweather", async function (req, res) {
             "temperature": temperature,
             "weatherState": state
         }
-        console.log(infoTobeSentback)
-        /*if (!favouriteCities.includes(cityName, 0)) {
-            favouriteCities.push(cityName)
-            console.log(cityName + ", Favourites: " + favouriteCities.toString())
-        } else console.log("NO!")*/
-        res.json(infoTobeSentback)
+        //console.log(infoTobeSentback)
+
+        favouriteCities.push(cityName)
+        console.log(favouriteCities)
+        res.status(200).json(infoTobeSentback)
     } else {
         res.status(404).send('City not found');
     }
@@ -170,9 +167,6 @@ app.get("/getcity", async function (req, res) {
 */
 
 
-
-
-
 app.post("/addcity", async function (req, res) {
     const city = req.query.city; // use a query parameter to get the city
     const geo_api_response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_KEY}`);
@@ -182,17 +176,19 @@ app.post("/addcity", async function (req, res) {
         const lon = geo_api_response.data[0].lon
 
         //const owm_response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
-*/        const cityName = geo_api_response.data[0].name
+*/
+        const cityName = geo_api_response.data[0].name
         const infoTobeSentback = {
             "cityName": cityName
         }
         console.log("Backend reached; " + infoTobeSentback)
         //pushCity(cityName)
         //favouriteCities.(cityName)
-        //favouriteCities
-        res.status(200).json(infoTobeSentback)
+        favouriteCities.push(cityName)
+        console.log(favouriteCities)
+        res.status(200).json("favCities: " + favouriteCities + "; " + infoTobeSentback)
     } else {
-        res.status(404).send('City not found');
+        res.status(404).json('City not found');
     }
 })
 
@@ -322,10 +318,20 @@ app.put("/username", (req, res) => {
 })
 */
 
-app.put('/cities', (req, res) => {
-    //let citiesList = req.body
+app.put('/cities/:cityName', (req, res) => {
+    const oldCityName = req.params.cityName
+    const newCityName = req.body.cityName
 
-    
+    const cityToUpdateIndex = favouriteCities.findIndex(city => city === oldCityName)
+    //const oldCityNameIndex = favouriteCities.findIndex(city => city)
+    //if (cityToUpdateIndex === -1) {
+    favouriteCities[cityToUpdateIndex] = newCityName
+    res.json({message: 'City name updated successfully; ', newCityName, favouriteCities})
+
+    //return res.status(404).json({message: 'City not found!'})
+    //} else {
+
+            //}
 })
 
 
