@@ -6,11 +6,9 @@ const cookieParser = require("cookie-parser");
 const session = require('express-session');
 const store = new session.MemoryStore()
 const bcrypt = require('bcrypt')
-const fs = require('fs');
 const bodyParser = require('body-parser')
 const {readUserData, writeUserData} = require('./usersList.json')
 const {users, addUser} = require("./usersList");
-const {hash} = require("bcrypt");
 const API_KEY = 'c3f5d777155024ea1c2c209f90f0f34e';
 
 
@@ -57,9 +55,11 @@ app.post('/register', (req, res) => {
     } else {
         let newUser = {
             username: username,
-            password: bcrypt.hash(password, 10, (error, hash) => {
+            password: bcrypt.hash(password, 10, (error) => {
                 if (error) {
                     console.error('Error while hashing: ', error)
+                } else {
+                    console.log('Successfully registered the data!')
                 }
             })
         }
@@ -116,9 +116,7 @@ app.post("/get_favourite_weather", async function (req, res) {
         const infoTobeSentback = {
             "cityName": cityName
         }
-        console.log("Backend reached; " + infoTobeSentback)
         favouriteCities.push(cityName)
-        console.log(favouriteCities)
         res.status(200).json("favouriteCities: " + favouriteCities + "; " + infoTobeSentback)
     } else {
         res.status(404).json('City not found');

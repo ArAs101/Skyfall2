@@ -5,7 +5,6 @@ window.onload = function () {
     banner.textContent = 'Manage your favourite cities!'
     citiesList.append(banner)
 
-    console.log(cookies)
     if (cookies.includes('myUsername')) {
         let topRightField = document.getElementById('login_register_field_top_right')
         topRightField.textContent = ''
@@ -67,7 +66,6 @@ function loadData(data) {
 
     const cookies = document.cookie
     if (cookies.includes('myUsername=')) {
-        console.log('You are logged in!')
         myLabel = document.createElement("h3").textContent = data.weatherState[0].description
         myResults.append(myLabel)
     } else {
@@ -90,7 +88,7 @@ function manageFavourites(data) {
         citiesList.append(cityButton)
         cityButton.addEventListener("click", function (ev) {
             ev.preventDefault();
-            fetch(`http://localhost:3000/getweather?city=${city}`)
+            fetch(`http://localhost:3000/getweather?city=${newCity.value}`)
                 .then(response => response.json())
                 .then(response => {
                     loadData(response)
