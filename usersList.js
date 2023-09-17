@@ -3,10 +3,9 @@ let users = []
 function saveUser() {
     fs.writeFile('./usersList.json', JSON.stringify(users), function (err)  {
         if (err) {
-            console.log('Error: User couldnt be saved!')
+            console.log("Error: User couldn't be saved!")
         }
     })
-
 }
 
 function loadUser() {

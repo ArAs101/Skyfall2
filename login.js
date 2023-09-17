@@ -1,6 +1,3 @@
-function addCookie(name, value) {
-    document.cookie = `${name}=${value}; `
-}
 window.onload = function () {
     document.getElementById('login_button').addEventListener('click', function (ev) {
         ev.preventDefault()
@@ -8,11 +5,6 @@ window.onload = function () {
             username: document.getElementById('login_username_input').value,
             password: document.getElementById('login_password_input').value
         }
-        console.log(JSON.stringify(formData))
-        //Get form data
-        //const formData = new formData(this)
-        // Send POST request to server
-        console.log('About to fetch')
         fetch('/login', {
             method: 'POST',
             headers:{"Content-Type":"application/json"},
@@ -36,4 +28,7 @@ window.onload = function () {
             console.error('Problem with fetch operation: ', error)
         })
     })
+}
+function addCookie(name, value) {
+    document.cookie = `${name}=${value}; `
 }

@@ -1,7 +1,9 @@
 body {
     background-image: -webkit-linear-gradient(top left, yellow 0%, blue 100%);
 }
-
+.gui {
+    text-align: center;
+}
 #Titles {
     background-image: url("cloudy_sun.png");
     text-align: center;
@@ -14,7 +16,6 @@ h1 {
 #login_register_field_top_right {
     background-color: orange;
     text-align: right;
-    /*justify-content: right;*/
     padding-right: 1px;
 }
 
